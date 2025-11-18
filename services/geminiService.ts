@@ -2,9 +2,44 @@ import { GoogleGenAI, Modality, Type } from "@google/genai";
 import { ProcessedContent, UserSettings } from "../types";
 import { CRITICAL_KEYWORDS } from "../constants";
 
-// NOTE: in a production Python/FastAPI backend, these keys would be server-side.
-// For this frontend MVP, we use the client SDK directly.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Helper to retrieve API Key from various possible environment configurations
+const getApiKey = (): string => {
+  // 1. Check specific Vite prefix (Recommended for Vercel + Vite)
+  // @ts-ignore
+  if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+    // @ts-ignore
+    return import.meta.env.VITE_API_KEY;
+  }
+  
+  // 2. Check specific React App prefix (Create React App legacy)
+  if (typeof process !== 'undefined' && process.env && process.env.REACT_APP_API_KEY) {
+    return process.env.REACT_APP_API_KEY;
+  }
+
+  // 3. Check standard process.env (Node/Webpack fallback)
+  if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+    return process.env.API_KEY;
+  }
+
+  // 4. Fallback to window polyfill (last resort)
+  if ((window as any).process && (window as any).process.env && (window as any).process.env.API_KEY) {
+    return (window as any).process.env.API_KEY;
+  }
+  
+  return '';
+};
+
+// Lazy-load the AI instance. 
+// Do NOT initialize at the top level, or the app will crash if the key is missing on startup.
+const getAI = () => {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.error("CRITICAL: Google Gemini API Key is missing.");
+    console.log("Please check your Vercel Environment Variables. Key name should be: VITE_API_KEY");
+    throw new Error("Configuration Error: API Key is missing. Please check settings.");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const processImage = async (base64Image: string, settings: UserSettings): Promise<ProcessedContent> => {
   // Remove header if present (data:image/jpeg;base64,)
@@ -23,6 +58,7 @@ export const processImage = async (base64Image: string, settings: UserSettings):
   `;
 
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: model,
       contents: {
@@ -66,12 +102,13 @@ export const processImage = async (base64Image: string, settings: UserSettings):
 
   } catch (error) {
     console.error("Gemini Vision Error:", error);
-    throw new Error("Failed to process image. Please try again with better lighting.");
+    throw new Error("Failed to process image. " + (error as Error).message);
   }
 };
 
 export const translateText = async (text: string, targetLanguage: string): Promise<string> => {
   try {
+    const ai = getAI();
     // gemini-2.5-flash is extremely fast for text-to-text tasks
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
@@ -88,6 +125,7 @@ export const translateText = async (text: string, targetLanguage: string): Promi
 
 export const generateSpeech = async (text: string, language: string): Promise<AudioBuffer> => {
   try {
+    const ai = getAI();
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash-preview-tts",
       contents: [{ parts: [{ text: text }] }],
