@@ -1,0 +1,8 @@
+{
+  "name": "NoSpecs",
+  "description": "AI-powered visual assistant for text comprehension without glasses. Features OCR, simplification, translation, and high-fidelity text-to-speech.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
