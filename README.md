@@ -41,7 +41,8 @@ By leveraging state-of-the-art Generative AI, NoSpecs captures physical text, si
 
 1.  **Clone the repository**
     ```bash
-    git clone https://github.com/yourusername/nospecs.git
+    git clone https://github.com/Hadiatahir527/NoSpecs-AI-assistant-.git
+    
     cd nospecs
     ```
 
