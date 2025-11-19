@@ -6,7 +6,6 @@ By leveraging state-of-the-art Generative AI, NoSpecs captures physical text, si
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![Status](https://img.shields.io/badge/status-MVP-green)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
 ## 🚀 Features
 
@@ -54,7 +53,7 @@ By leveraging state-of-the-art Generative AI, NoSpecs captures physical text, si
 3.  **Configure Environment**
     Create a `.env` file in the root directory and add your Gemini API key:
     ```env
-    REACT_APP_API_KEY=your_google_gemini_api_key
+    VITE_API_KEY=your_google_gemini_api_key
     ```
     *(Note: For this MVP, the key is handled via process.env)*
 
@@ -81,10 +80,6 @@ By leveraging state-of-the-art Generative AI, NoSpecs captures physical text, si
 
 *   **Ephemeral Processing**: Images are processed in memory and sent to the AI provider solely for extraction; no images are permanently stored on the server in this version.
 *   **Audit Logs**: Critical safety information submissions are hashed before being queued for review.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 *Designed with ❤️ for inclusive technology.*
